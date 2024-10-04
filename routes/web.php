@@ -1,12 +1,21 @@
 <?php
 
-use App\Http\Controllers\Users;
+use App\Http\Controllers\FrontController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [Users::class, 'usuarios']) -> name('usuarios');
-Route::get('/create', [Users::class, 'create']) -> name('create');
-Route::post('/store', [Users::class, 'store']) -> name('store');
-Route::get('/show/{id}', [Users::class, 'show']) -> name('show');
-Route::get('/edit/{id}', [Users::class, 'edit']) -> name('edit');
-Route::put('/update/{id}', [Users::class, 'update']) -> name('update');
-Route::delete('/destroy/{id}', [Users::class, 'destroy']) -> name('destroy');
+Route::controller(FrontController::class)->group(function(){
+    Route::get('/', 'index')->name('front.index');
+});
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
